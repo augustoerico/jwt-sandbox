@@ -17,8 +17,15 @@ class HelloRouter {
     }
 
     def route() {
-        router.route('/*').handler JWTAuthHandler.create(authProvider).&handle
-        router.route(HttpMethod.GET, '/hello').handler GetHelloHandler.handle
+        router.route('/hello/*')
+                .handler JWTAuthHandler.create(authProvider).addAuthority('hello').&handle
+        router.route(HttpMethod.GET, '/hello')
+                .handler GetHelloHandler.handle
+
+        router.route('/hello/there/*')
+                .handler JWTAuthHandler.create(authProvider).addAuthority('hello-there').&handle
+        router.get('/hello/there')
+                .handler GetHelloHandler.handle // TODO add a get-hello-there handler
     }
 
     static create(Router router, AuthProvider authProvider) {
