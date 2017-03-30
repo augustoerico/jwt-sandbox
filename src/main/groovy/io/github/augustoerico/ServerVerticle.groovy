@@ -1,6 +1,7 @@
 package io.github.augustoerico
 
 import io.github.augustoerico.config.Env
+import io.github.augustoerico.routes.AuthRouter
 import io.github.augustoerico.routes.HealthRouter
 import io.github.augustoerico.routes.HelloRouter
 import io.vertx.core.AbstractVerticle
@@ -24,8 +25,11 @@ class ServerVerticle extends AbstractVerticle {
 
         router.route().handler(cors)
 
+        def authProvider = JWTAuth.create(vertx, Env.authProviderConfig())
+
         HealthRouter.create(router).route()
-        HelloRouter.create(router, JWTAuth.create(vertx, Env.authProviderConfig())).route()
+        AuthRouter.create(router, authProvider).route()
+        HelloRouter.create(router, authProvider).route()
 
         vertx.createHttpServer()
                 .requestHandler(router.&accept)
